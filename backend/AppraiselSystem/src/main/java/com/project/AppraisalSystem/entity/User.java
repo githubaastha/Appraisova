@@ -56,9 +56,11 @@ public class User {
     @Column(name = "invite_token_expiry")
     private LocalDateTime inviteTokenExpiry;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean isActive = true;
 
+    @Builder.Default
     @Column(name = "first_login", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean firstLogin = false;
 

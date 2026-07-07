@@ -54,17 +54,15 @@ public class AuthController {
     @Transactional
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO request) {
-
         User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
-        if (user == null) return ResponseEntity.status(401).build();
-
-        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadRequestException("Invalid email or password");
+        }
 
         if (!Boolean.TRUE.equals(user.getIsActive())) {
             throw new AccessDeniedException("Your account has been deactivated. Please contact HR.");
         }
-        if (!matches) return ResponseEntity.status(401).build();
 
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name(), user.getUserId());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
@@ -96,17 +94,11 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDTO request) {
 
         Optional<RefreshToken> refreshTokenOpt = refreshTokenService.findByToken(request.getRefreshToken());
-
         if (refreshTokenOpt.isEmpty()) {
-            return ResponseEntity.status(403).body("Refresh token not found. Please log in again.");
+            throw new BadRequestException("Refresh token not found. Please log in again.");
         }
 
-        RefreshToken refreshToken;
-        try {
-            refreshToken = refreshTokenService.verifyExpiration(refreshTokenOpt.get());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        }
+        RefreshToken refreshToken = refreshTokenService.verifyExpiration(refreshTokenOpt.get());
 
         User user = refreshToken.getUser();
 
