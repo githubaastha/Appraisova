@@ -27,23 +27,24 @@ export default function Reports() {
     const [downloading, setDownloading] = useState(false)
     const [downloadError, setDownloadError] = useState('')
 
-    useEffect(() => {
-        setLoading(true)
-        getAllAppraisals()
-            .then(data => {
-                setAppraisals(data.map(a => ({
-                    appraisalId: a.appraisalId,
-                    employeeName: a.employeeName,
-                    department: a.department,
-                    managerName: a.managerName,
-                    cycleName: a.cycleName,
-                    status: a.appraisalStatus,
-                    createdAt: a.createdAt,
-                    managerRating: a.managerRating ?? null
-                })))
-            })
-            .finally(() => setLoading(false))
-    }, [])
+  useEffect(() => {
+    setLoading(true)
+    getAllAppraisals(0, 1000)
+        .then(response => {
+            const data = response.content
+            setAppraisals(data.map(a => ({
+                appraisalId: a.appraisalId,
+                employeeName: a.employeeName,
+                department: a.department,
+                managerName: a.managerName,
+                cycleName: a.cycleName,
+                status: a.appraisalStatus,
+                createdAt: a.createdAt,
+                managerRating: a.managerRating ?? null
+            })))
+        })
+        .finally(() => setLoading(false))
+}, [])
 
     const cycles = Array.from(new Set(appraisals.map(a => a.cycleName)))
 

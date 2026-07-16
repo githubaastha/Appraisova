@@ -1,31 +1,33 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { getLoggedInUser } from "./utils/auth";
-import Login from "./pages/auth/Login";
-import Dashboard from "./pages/Dashboard";
-import Appraisal from "./pages/Appraisal";
-import Goals from "./pages/Goals";
-import Profile from "./pages/Profile";
-import AppraisalGuide from "./pages/AppraisalGuide";
-import SampleForm from "./pages/SampleForm";
-import ManagerDashboard from "./pages/manager/ManagerDashboard";
-import TeamGoals from "./pages/manager/TeamGoals";
-import TeamReport from "./pages/manager/TeamReport";
-import MyTeam from "./pages/manager/MyTeam";
-import ReviewAppraisal from "./pages/manager/ReviewAppraisal";
-import MyGoals from "./pages/manager/MyGoals";
-import MyAppraisals from "./pages/manager/MyAppraisals";
-import ManagerAppraisalDetail from "./pages/manager/ManagerAppraisalDetail";
-import AppraisalDetail from "./pages/AppraisalDetail";
-import HRDashboard from "./pages/hr/HRDashboard";
-import Users from "./pages/hr/Users";
-import Departments from "./pages/hr/Departments";
-import CreateAppraisal from "./pages/hr/CreateAppraisal";
-import ManageAppraisals from "./pages/hr/ManageAppraisal";
-import Reports from "./pages/hr/Reports";
-import SetupAccount from "./pages/auth/SetupAccount";
-import ManagerProfile from "./pages/manager/ManagerProfile";
-import ResetPassword from "./pages/auth/ResetPassword";
-import ForgotPassword from "./pages/auth/ForgotPassword";
+import { lazy, Suspense } from "react";
+
+const Login = lazy(() => import("./pages/auth/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Appraisal = lazy(() => import("./pages/Appraisal"));
+const Goals = lazy(() => import("./pages/Goals"));
+const Profile = lazy(() => import("./pages/Profile"));
+const AppraisalGuide = lazy(() => import("./pages/AppraisalGuide"));
+const SampleForm = lazy(() => import("./pages/SampleForm"));
+const ManagerDashboard = lazy(() => import("./pages/manager/ManagerDashboard"));
+const TeamGoals = lazy(() => import("./pages/manager/TeamGoals"));
+const TeamReport = lazy(() => import("./pages/manager/TeamReport"));
+const MyTeam = lazy(() => import("./pages/manager/MyTeam"));
+const ReviewAppraisal = lazy(() => import("./pages/manager/ReviewAppraisal"));
+const MyGoals = lazy(() => import("./pages/manager/MyGoals"));
+const MyAppraisals = lazy(() => import("./pages/manager/MyAppraisals"));
+const ManagerAppraisalDetail = lazy(() => import("./pages/manager/ManagerAppraisalDetail"));
+const AppraisalDetail = lazy(() => import("./pages/AppraisalDetail"));
+const HRDashboard = lazy(() => import("./pages/hr/HRDashboard"));
+const Users = lazy(() => import("./pages/hr/Users"));
+const Departments = lazy(() => import("./pages/hr/Departments"));
+const CreateAppraisal = lazy(() => import("./pages/hr/CreateAppraisal"));
+const ManageAppraisals = lazy(() => import("./pages/hr/ManageAppraisal"));
+const Reports = lazy(() => import("./pages/hr/Reports"));
+const SetupAccount = lazy(() => import("./pages/auth/SetupAccount"));
+const ManagerProfile = lazy(() => import("./pages/manager/ManagerProfile"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) {
     const isLoggedIn = localStorage.getItem('isLoggedIn')
@@ -40,6 +42,11 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode,
 function App() {
     return (
         <BrowserRouter>
+         <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="w-10 h-10 border-4 border-gray-200 border-t-[#1089D3] rounded-full animate-spin" />
+                </div>
+            }>
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<Navigate to="/login" />} />
@@ -77,6 +84,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
             </Routes>
+            </Suspense>
         </BrowserRouter>
     )
 }

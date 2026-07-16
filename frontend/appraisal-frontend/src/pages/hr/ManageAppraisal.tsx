@@ -37,31 +37,34 @@ export default function ManageAppraisals() {
         loadAppraisals(true)
     }, [])
     const loadAppraisals = async (isInitialLoad = false) => {
-        try {
-            if (isInitialLoad) setLoading(true)
+    try {
+        if (isInitialLoad) setLoading(true)
 
-            const data = await getAllAppraisals()
+        const response = await getAllAppraisals(0, 1000)
+        const data = response.content
 
-            const rows = data.map(a => ({
-                appraisalId: a.appraisalId,
-                employeeName: a.employeeName,
-                department: a.department,
-                managerName: a.managerName,
-                managerId: a.managerId,
-                cycleName: a.cycleName,
-                cycleStartDate: a.cycleStartDate,
-                cycleEndDate: a.cycleEndDate,
-                status: a.appraisalStatus,
-                createdAt: a.createdAt
-            }))
+        const rows = data.map(a => ({
+            appraisalId: a.appraisalId,
+            employeeName: a.employeeName,
+            department: a.department,
+            managerName: a.managerName,
+            managerId: a.managerId,
+            cycleName: a.cycleName,
+            cycleStartDate: a.cycleStartDate,
+            cycleEndDate: a.cycleEndDate,
+            status: a.appraisalStatus,
+            createdAt: a.createdAt
+        }))
 
-            setAppraisals(rows)
-        } catch (error) {
-            console.error(error)
-        } finally {
-            if (isInitialLoad) setLoading(false)
-        }
+        setAppraisals(rows)
+    } catch (error) {
+        console.error(error)
+    } finally {
+        if (isInitialLoad) setLoading(false)
     }
+}
+
+             
 
     const cycles = [...new Set(appraisals.map(a => a.cycleName))]
     const departments = [

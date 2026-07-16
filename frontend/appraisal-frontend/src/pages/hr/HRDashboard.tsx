@@ -41,54 +41,57 @@ export default function HRDashboard() {
         loadDashboard(true)
     }, [])
 
-    async function loadDashboard(isInitialLoad = false) {
-        try {
-            if (isInitialLoad) setLoading(true)
+   async function loadDashboard(isInitialLoad = false) {
+    try {
+        if (isInitialLoad) setLoading(true)
 
-            const [users, departments, appraisalData] = await Promise.all([
-                getUsers(),
-                getDepartments(),
-                getAllAppraisals()
-            ])
+        const [users, departments, appraisalResponse] = await Promise.all([
+            getUsers(),
+            getDepartments(),
+            getAllAppraisals(0, 1000)
+        ])
 
-            setActiveEmployees(
-                users.filter(u => u.isActive).length
-            )
+        const appraisalData = appraisalResponse.content
 
-            setTotalDepartments(departments.length)
+        setActiveEmployees(
+            users.filter(u => u.isActive).length
+        )
 
-            setPendingApproval(
-                appraisalData.filter(
-                    a => a.appraisalStatus === 'MANAGER_REVIEWED'
-                ).length
-            )
+        setTotalDepartments(departments.length)
 
-            setActiveCycles(
-                new Set(
-                    appraisalData
-                        .filter(a => a.appraisalStatus !== 'ACKNOWLEDGED')
-                        .map(a => a.cycleName)
-                ).size
-            )
+        setPendingApproval(
+            appraisalData.filter(
+                a => a.appraisalStatus === 'MANAGER_REVIEWED'
+            ).length
+        )
 
-            setAppraisals(
-                appraisalData.map(a => ({
-                    appraisalId: a.appraisalId,
-                    employeeName: a.employeeName,
-                    department: a.department,
-                    managerName: a.managerName,
-                    cycleName: a.cycleName,
-                    status: a.appraisalStatus,
-                    createdAt: a.createdAt
-                }))
-            )
+        setActiveCycles(
+            new Set(
+                appraisalData
+                    .filter(a => a.appraisalStatus !== 'ACKNOWLEDGED')
+                    .map(a => a.cycleName)
+            ).size
+        )
 
-        } catch (error) {
-            console.error('Failed to load dashboard:', error)
-        } finally {
-            if (isInitialLoad) setLoading(false)
-        }
+        setAppraisals(
+            appraisalData.map(a => ({
+                appraisalId: a.appraisalId,
+                employeeName: a.employeeName,
+                department: a.department,
+                managerName: a.managerName,
+                cycleName: a.cycleName,
+                status: a.appraisalStatus,
+                createdAt: a.createdAt
+            }))
+        )
+
+    } catch (error) {
+        console.error('Failed to load dashboard:', error)
+    } finally {
+        if (isInitialLoad) setLoading(false)
     }
+}
+          
 
     return (
         <div className="flex min-h-screen bg-gray-50">

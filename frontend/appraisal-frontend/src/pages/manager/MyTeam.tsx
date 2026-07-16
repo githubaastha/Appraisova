@@ -26,10 +26,12 @@ export default function MyTeam() {
         try {
             setLoading(true);
 
-            const [employeeData, appraisalData] = await Promise.all([
+            const [employeeData, appraisalResponse] = await Promise.all([
                 getUsersByManager(userId),
-                getAppraisalsByManager(userId)
+                getAppraisalsByManager(userId, 0, 1000)
             ]);
+
+            const appraisalData = appraisalResponse.content;
 
             setEmployees(employeeData);
             setAppraisals(appraisalData);
@@ -55,7 +57,7 @@ export default function MyTeam() {
             />
 
             <div className="flex-1 px-8 py-6 flex flex-col gap-6 overflow-auto">
-                <Topbar/>
+                <Topbar />
 
                 <div className="pb-4 border-b border-gray-200">
                     <h2 className="text-lg font-bold " style={{ color: '#111827' }}>My Team</h2>

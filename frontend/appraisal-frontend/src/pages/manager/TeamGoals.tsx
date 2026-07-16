@@ -59,11 +59,13 @@ export default function TeamGoals() {
         try {
             if (isInitialLoad) setLoading(true);
 
-            const [goalData, employeeData, appraisalData] = await Promise.all([
+            const [goalData, employeeData, appraisalResponse] = await Promise.all([
                 getGoalsByManager(userId),
                 getUsersByManager(userId),
-                getAppraisalsByManager(userId)
+                getAppraisalsByManager(userId, 0, 1000)
             ]);
+
+            const appraisalData = appraisalResponse.content;
 
             setGoals(goalData);
             setEmployees(employeeData);

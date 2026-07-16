@@ -34,11 +34,13 @@ export default function TeamReport() {
             setLoading(true);
             setError('');
 
-            const [employeeData, appraisalData, goalData] = await Promise.all([
+            const [employeeData, appraisalResponse, goalData] = await Promise.all([
                 getUsersByManager(userId),
-                getAppraisalsByManager(userId),
+                getAppraisalsByManager(userId, 0, 1000),
                 getGoalsByManager(userId)
             ]);
+
+            const appraisalData = appraisalResponse.content;
 
             setEmployees(employeeData);
             setAppraisals(appraisalData);
@@ -119,7 +121,7 @@ export default function TeamReport() {
             />
 
             <div className="flex-1 px-8 py-6 flex flex-col gap-6 overflow-auto">
-                <Topbar/>
+                <Topbar />
 
                 {loading ? (
                     <div className="flex-1 flex items-center justify-center">
@@ -140,11 +142,10 @@ export default function TeamReport() {
                             <button
                                 onClick={handleDownloadReport}
                                 disabled={!selectedCycle || downloading}
-                                className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-all mb-4 ${
-                                    !selectedCycle || downloading
+                                className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-all mb-4 ${!selectedCycle || downloading
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                         : 'bg-[#1089D3] text-white hover:bg-[#0e7abf]'
-                                }`}
+                                    }`}
                             >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />

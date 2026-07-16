@@ -11,10 +11,22 @@ import type {
 } from '../types'
 import type { AppraisalsByManagerDTO } from '../types'
 
-export const getAllAppraisals = async (): Promise<AppraisalsSummaryDTO[]> => {
-    const res = await api.get('/appraisals')
+export interface PagedResponse<T> {
+    content: T[]
+    totalElements: number
+    totalPages: number
+    number: number
+    size: number
+}
+
+export const getAllAppraisals = async (
+    page: number = 0,
+    size: number = 20
+): Promise<PagedResponse<AppraisalsSummaryDTO>> => {
+    const res = await api.get('/appraisals', { params: { page, size } })
     return res.data
 }
+
 
 export const createBulkAppraisals = async (
     dtos: AppraisalsRequestDTO[]
@@ -54,11 +66,14 @@ export const getAppraisalsByEmployee = async (
     return res.data
 }
 export const getAppraisalsByManager = async (
-    managerId: number
-): Promise<AppraisalsByManagerDTO[]> => {
-    const res = await api.get(`/appraisals/manager/${managerId}`)
+    managerId: number,
+    page: number = 0,
+    size: number = 20
+): Promise<PagedResponse<AppraisalsByManagerDTO>> => {
+    const res = await api.get(`/appraisals/manager/${managerId}`, { params: { page, size } })
     return res.data
 }
+
 export const getAppraisalById = async (id: number): Promise<EmployeeAppraisalResponseDTO> => {
     const res = await api.get(`/appraisals/${id}`)
     return res.data

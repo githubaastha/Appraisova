@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const api = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: API_BASE,
     headers: {
         "Content-Type": "application/json",
     },
@@ -42,7 +44,7 @@ api.interceptors.response.use(
                     throw new Error("No refresh token available");
                 }
 
-                const res = await axios.post("http://localhost:8080/api/auth/refresh", {
+                const res = await axios.post(`${API_BASE}/auth/refresh`, {
                     refreshToken,
                 });
 
@@ -64,7 +66,7 @@ api.interceptors.response.use(
             }
         }
 
-       
+
         if (error.response?.status === 401) {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('loggedInUser');

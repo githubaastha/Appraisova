@@ -21,7 +21,12 @@ export default function Topbar() {
     const unreadCount = notifications.filter(n => !n.isRead).length
 
     useEffect(() => {
-        getNotificationsByUser(userId).then(setNotifications)
+        getNotificationsByUser(userId).then(data => {
+            const sorted = [...data].sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            setNotifications(sorted)
+        })
     }, [])
 
     useEffect(() => {
@@ -81,7 +86,7 @@ export default function Topbar() {
                             {notifications.length === 0 ? (
                                 <p className="text-sm text-gray-400 text-center py-8">No notifications</p>
                             ) : (
-                                notifications.map(n => (
+                                notifications.slice(0, 5).map(n => (
                                     <div
                                         key={n.notificationId}
                                         onClick={() => !n.isRead && handleMarkAsRead(n.notificationId)}
@@ -99,6 +104,11 @@ export default function Topbar() {
 
                         <div className="px-4 py-2.5 text-center border-t border-gray-100">
                             <p className="text-xs text-gray-400">Click a notification to mark as read</p>
+                            {notifications.length > 5 && (
+                                <p className="text-[10px] text-gray-400 mt-1">
+                                    Showing 5 most recent — check your email for older notifications
+                                </p>
+                            )}
                         </div>
                     </div>
                 )}

@@ -36,14 +36,14 @@ export default function ManagerDashboard() {
         try {
             if (isInitialLoad) setLoading(true)
             setError('')
-            const [myAppraisalData, teamAppraisalData, goalData, employeeData] = await Promise.all([
+            const [myAppraisalData, teamAppraisalResponse, goalData, employeeData] = await Promise.all([
                 managerId ? getAppraisalsByEmployee(userId) : Promise.resolve([]),
-                getAppraisalsByManager(userId),
+                getAppraisalsByManager(userId, 0, 1000),
                 getGoalsByManager(userId),
                 getUsersByManager(userId)
             ])
             setMyAppraisals(myAppraisalData)
-            setTeamAppraisals(teamAppraisalData)
+            setTeamAppraisals(teamAppraisalResponse.content)
             setTeamGoals(goalData)
             setEmployees(employeeData)
         } catch (err) {

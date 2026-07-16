@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+
 import logo from "../../assets/logo.png"
+import api from '../../api/axios'
+import axios from 'axios'
 
 function Login() {
     const [email, setEmail] = useState('')
@@ -25,7 +27,7 @@ function Login() {
         setError('')
 
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/login', {
+            const response = await api.post('/auth/login', {
                 email,
                 password
             })
@@ -61,8 +63,12 @@ function Login() {
             else if (user.role === 'EMPLOYEE' && user.firstLogin) navigate('/guide')
             else navigate('/dashboard')
 
-        } catch (err: any) {
-            setError(err.response?.data || err.response?.data?.message || 'Invalid email or password')
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Invalid email or password')
+            } else {
+                setError('Something went wrong. Please try again.')
+            }
         } finally {
             setLoading(false)
         }
@@ -94,34 +100,38 @@ function Login() {
                 </div>
 
                 {error && (
-                    <p className="text-red-700 text-xs text-center">{error}</p>
+                    <p role="alert" className="text-red-700 text-xs text-center">{error}</p>
                 )}
-
                 <div className="flex flex-col gap-2  ">
-                    <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input
+                        id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter Your Email"
+                        autoComplete="email"
                         className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 placeholder:text-gray-400 focus:border-[#1089D3] focus:ring-2 focus:ring-[#1089D3]/20 focus:outline-none"
                     />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700 mb-1 mt-3">Password</label>
+                    <label htmlFor="password" className="text-sm font-medium text-gray-700 mb-1 mt-3">Password</label>
                     <div className="relative flex items-center">
                         <input
+                            id="password"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter Your Password"
+                            autoComplete="current-password"
                             className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-800 placeholder:text-gray-400 focus:border-[#1089D3] focus:ring-2 focus:ring-[#1089D3]/20 focus:outline-none"
                         />
 
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
                             className="absolute right-4 text-[#12B1D1] hover:text-[#1089D3] transition-colors"
                         >
                             {showPassword ? (
@@ -141,8 +151,9 @@ function Login() {
                 </div>
                 <div className="flex justify-between items-center text-sm mb-6 mt-2">
 
-                    <label className="flex items-center gap-2 text-gray-600">
+                    <label htmlFor="rememberMe" className="flex items-center gap-2 text-gray-600">
                         <input
+                            id="rememberMe"
                             type="checkbox"
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.target.checked)}
