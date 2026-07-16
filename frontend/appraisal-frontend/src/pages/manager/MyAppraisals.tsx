@@ -4,7 +4,7 @@ import AppraisalListRow from '../../components/appraisal/AppraisalListRow'
 import { getLoggedInUser } from '../../utils/auth'
 import { getAppraisalsByEmployee } from '../../api/appraisalApi'
 import type { AppraisalsByEmployeeDTO } from '../../types'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function MyAppraisals() {
     const { name, initials, role, managerId, userId } = getLoggedInUser()

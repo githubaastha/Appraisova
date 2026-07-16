@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
-import Topbar from '@/components/Topbar'
+import Topbar from '../components/Topbar'
 import GoalsStatCards from '../components/goals/GoalsStatCards'
 import GoalsFilter from '../components/goals/GoalsFilter'
 import GoalsTable from '../components/goals/GoalsTable'

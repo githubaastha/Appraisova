@@ -5,7 +5,7 @@ import AppraisalDetailContent from '../../components/appraisal/AppraisalDetailCo
 import { getLoggedInUser } from '../../utils/auth'
 import { getAppraisalById } from '../../api/appraisalApi'
 import type { EmployeeAppraisalResponseDTO } from '../../types'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function ManagerAppraisalDetail() {
     const { appraisalId } = useParams()

@@ -10,7 +10,7 @@ import { getAppraisalsByManager, exportTeamReport } from '../../api/appraisalApi
 import { getGoalsByManager } from '../../api/goalApi'
 
 import type { UserResponseDTO, AppraisalsByManagerDTO, GoalResponseDTO } from '../../types'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function TeamReport() {
     const { name, initials, role, managerId, userId } = getLoggedInUser()

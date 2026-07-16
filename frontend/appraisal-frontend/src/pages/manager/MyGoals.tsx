@@ -6,7 +6,7 @@ import GoalsTable from '../../components/goals/GoalsTable'
 import type { GoalStatus, GoalResponseDTO } from '../../types'
 import { getLoggedInUser } from '../../utils/auth'
 import { getGoalsByEmployee, submitGoalCompletion } from '../../api/goalApi'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function MyGoals() {
     const { name, initials, role, managerId, userId } = getLoggedInUser()

@@ -8,7 +8,7 @@ import { getUsersByManager } from '../../api/usersApi'
 import { getAppraisalsByManager } from '../../api/appraisalApi'
 
 import type { UserResponseDTO, AppraisalsByManagerDTO } from '../../types'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function MyTeam() {
     const { name, initials, role, managerId, userId } = getLoggedInUser()

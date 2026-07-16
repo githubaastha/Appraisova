@@ -26,7 +26,7 @@ import {
     getAppraisalsByEmployee,
     getAppraisalsByManager
 } from '../../api/appraisalApi'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function TeamGoals() {
 

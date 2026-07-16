@@ -4,7 +4,7 @@ import ManagerSidebar from '../../components/ManagerSidebar'
 import { getLoggedInUser } from '../../utils/auth'
 import { getAppraisalsByEmployee, saveManagerReviewDraft, submitManagerReview, getAppraisalForManager } from '../../api/appraisalApi'
 import type { ManagerAppraisalResponseDTO } from '../../types'
-import Topbar from '@/components/Topbar'
+import Topbar from '../../components/Topbar'
 
 export default function ReviewAppraisal() {
     const { employeeId } = useParams()
