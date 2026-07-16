@@ -68,7 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found with id: " + userId));
-        return notificationRepository.findAllByUser_UserId(userId)
+        return notificationRepository.findAllByUser_UserIdOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(this::toSummaryDTO)
                 .collect(Collectors.toList());
@@ -245,7 +245,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found with id: " + userId));
         List<Notification> all = notificationRepository
-                .findAllByUser_UserId(userId);
+                .findAllByUser_UserIdOrderByCreatedAtDesc(userId);
         notificationRepository.deleteAll(all);
         return "All notifications cleared";
     }

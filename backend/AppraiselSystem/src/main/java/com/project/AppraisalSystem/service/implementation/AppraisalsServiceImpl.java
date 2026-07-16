@@ -16,6 +16,9 @@ import com.project.AppraisalSystem.service.AppraisalsService;
 import com.project.AppraisalSystem.service.NotificationService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,11 +127,9 @@ public class AppraisalsServiceImpl implements AppraisalsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppraisalsSummaryDTO> findAllAppraisals() {
-        return appraisalsRepository.findAll()
-                .stream()
-                .map(this::toSummaryDTO)
-                .collect(Collectors.toList());
+    public Page<AppraisalsSummaryDTO> findAllAppraisals(Pageable pageable) {
+        return appraisalsRepository.findAllPaged(pageable)
+                .map(this::toSummaryDTO);
     }
 
     @Override
@@ -173,14 +174,12 @@ public class AppraisalsServiceImpl implements AppraisalsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppraisalsByManagerDTO> findAppraisalsByManager_Id(Long managerId) {
+    public Page<AppraisalsByManagerDTO> findAppraisalsByManager_Id(Long managerId, Pageable pageable) {
         userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Manager not found with id: " + managerId));
-        return appraisalsRepository.findAllByManager_UserId(managerId)
-                .stream()
-                .map(this::toManagerDTO)
-                .collect(Collectors.toList());
+        return appraisalsRepository.findAllByManager_UserId(managerId, pageable)
+                .map(this::toManagerDTO);
     }
 
     @Override
@@ -197,30 +196,28 @@ public class AppraisalsServiceImpl implements AppraisalsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppraisalsSummaryDTO> findAppraisalsByCycle(String cycleName) {
-        return appraisalsRepository.findAllByCycleName(cycleName.trim())
-                .stream()
-                .map(this::toSummaryDTO)
-                .collect(Collectors.toList());
+    public Page<AppraisalsSummaryDTO> findAppraisalsByCycle(String cycleName, Pageable pageable) {
+        return appraisalsRepository.findAllByCycleName(cycleName.trim(), pageable)
+                .map(this::toSummaryDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppraisalsSummaryDTO> findAppraisalsByStatus(AppraisalStatus status) {
-        return appraisalsRepository.findAllByAppraisalStatus(status)
-                .stream()
-                .map(this::toSummaryDTO)
-                .collect(Collectors.toList());
+    public Page<AppraisalsSummaryDTO> findAppraisalsByStatus(AppraisalStatus status, Pageable pageable) {
+        return appraisalsRepository.findAllByAppraisalStatus(status, pageable)
+                .map(this::toSummaryDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppraisalsSummaryDTO> findAppraisalsByCycleStatus(CycleStatus cycleStatus) {
-        return appraisalsRepository.findAllByCycleStatus(cycleStatus)
-                .stream()
-                .map(this::toSummaryDTO)
-                .collect(Collectors.toList());
+    public Page<AppraisalsSummaryDTO> findAppraisalsByCycleStatus(CycleStatus cycleStatus, Pageable pageable) {
+        return appraisalsRepository.findAllByCycleStatus(cycleStatus, pageable)
+                .map(this::toSummaryDTO);
     }
+
+
+
+
 
 
     @Override
@@ -669,7 +666,8 @@ public class AppraisalsServiceImpl implements AppraisalsService {
     @Override
     @Transactional(readOnly = true)
     public byte[] generateReportExcel(String cycleName) {
-        List<AppraisalsSummaryDTO> appraisals = findAppraisalsByCycle(cycleName);
+        List<AppraisalsSummaryDTO> appraisals = findAppraisalsByCycle(
+                cycleName, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
 
         if (appraisals.isEmpty()) {
             throw new ResourceNotFoundException(
@@ -736,11 +734,13 @@ public class AppraisalsServiceImpl implements AppraisalsService {
     @Override
     @Transactional(readOnly = true)
     public byte[] generateTeamReportExcel(Long managerId, String cycleName) {
-        List<AppraisalsByManagerDTO> teamAppraisals = findAppraisalsByManager_Id(managerId)
+        List<AppraisalsByManagerDTO> teamAppraisals = findAppraisalsByManager_Id(
+                managerId, PageRequest.of(0, Integer.MAX_VALUE))
+                .getContent()
                 .stream()
                 .filter(a -> a.getCycleName() != null
                         && a.getCycleName().equalsIgnoreCase(cycleName.trim()))
-                .collect(Collectors.toList());
+                .toList();
 
         if (teamAppraisals.isEmpty()) {
             throw new ResourceNotFoundException(
@@ -803,5 +803,12 @@ public class AppraisalsServiceImpl implements AppraisalsService {
             throw new RuntimeException(
                     "Failed to generate team report for manager: " + managerId + " in cycle: " + cycleName, e);
         }
+    }
+
+    @Override
+    public boolean isOwner(Long appraisalId, Long employeeId) {
+        return appraisalsRepository.findById(appraisalId)
+                .map(appraisal -> appraisal.getEmployee().getUserId().equals(employeeId))
+                .orElse(false);
     }
 }

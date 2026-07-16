@@ -4,22 +4,24 @@ import com.project.AppraisalSystem.dto.*;
 import com.project.AppraisalSystem.entity.enums.AppraisalStatus;
 import com.project.AppraisalSystem.entity.enums.CycleStatus;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface AppraisalsService {
 
     //-------------------Get Method ----------------------------------------------------------------------
 
-    List<AppraisalsSummaryDTO> findAllAppraisals();
+    Page<AppraisalsSummaryDTO> findAllAppraisals(Pageable pageable);
     EmployeeAppraisalResponseDTO findAppraisalDetailById(Long appraisalId);
     ManagerAppraisalResponseDTO findAppraisalForManager(Long appraisalId);
     List<AppraisalsByEmployeeDTO> findAppraisalsByEmployee_Id(Long employeeId);
     List<AppraisalsByEmployeeDTO> findAppraisalsByEmployeeEmail(String email);
-    List<AppraisalsByManagerDTO> findAppraisalsByManager_Id(Long managerId);
+    Page<AppraisalsByManagerDTO> findAppraisalsByManager_Id(Long managerId, Pageable pageable);
     List<AppraisalsByManagerDTO> findAppraisalsByManagerEmail(String email);
-    List<AppraisalsSummaryDTO> findAppraisalsByCycle(String cycleName);
-    List<AppraisalsSummaryDTO> findAppraisalsByStatus(AppraisalStatus status);
-    List<AppraisalsSummaryDTO> findAppraisalsByCycleStatus(CycleStatus cycleStatus);
+    Page<AppraisalsSummaryDTO> findAppraisalsByCycle(String cycleName, Pageable pageable);
+    Page<AppraisalsSummaryDTO> findAppraisalsByStatus(AppraisalStatus status, Pageable pageable);
+    Page<AppraisalsSummaryDTO> findAppraisalsByCycleStatus(CycleStatus cycleStatus, Pageable pageable);
 
 
     //-------------------------Create-----------------------------------------------------
@@ -50,6 +52,8 @@ public interface AppraisalsService {
 
     byte[] generateReportExcel(String cycleName);
     byte[] generateTeamReportExcel(Long managerId, String cycleName);
+
+    boolean isOwner(Long appraisalId, Long employeeId);
 
 
 }

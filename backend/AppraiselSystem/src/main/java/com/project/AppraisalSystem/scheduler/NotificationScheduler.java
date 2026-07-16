@@ -25,13 +25,14 @@ public class NotificationScheduler {
     public void sendGoalDueReminders() {
         LocalDate sevenDaysLater = LocalDate.now().plusDays(7);
 
-        List<Goals> dueSoon = goalsRepository.findAll().stream()
-                .filter(g -> g.getDueDate() != null
-                        && g.getDueDate().equals(sevenDaysLater)
-                        && g.getStatus() != GoalStatus.COMPLETED
-                        && g.getStatus() != GoalStatus.CANCELLED
-                        && g.getStatus() != GoalStatus.NOT_COMPLETED)
-                .toList();
+        List<GoalStatus> excludedStatuses = List.of(
+                GoalStatus.COMPLETED,
+                GoalStatus.CANCELLED,
+                GoalStatus.NOT_COMPLETED
+        );
+
+        List<Goals> dueSoon = goalsRepository.findAllByDueDateAndStatusNotIn(
+                sevenDaysLater, excludedStatuses);
 
         for (Goals goal : dueSoon) {
             notificationService.createNotification(
@@ -44,4 +45,5 @@ public class NotificationScheduler {
             );
         }
     }
+
 }

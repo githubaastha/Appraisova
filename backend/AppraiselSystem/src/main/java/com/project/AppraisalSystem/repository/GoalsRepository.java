@@ -5,6 +5,7 @@ import com.project.AppraisalSystem.entity.enums.GoalStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -18,6 +19,5 @@ public interface GoalsRepository extends JpaRepository<Goals,Long> {
     List<Goals> findAllByAppraisal_AppraisalIdAndEmployeeCompleted(Long appraisalId, Boolean employeeCompleted);
     List<Goals> findByAppraisal_Manager_UserId(Long managerId);
 
-
-
+    List<Goals> findAllByDueDateAndStatusNotIn(LocalDate dueDate, List<GoalStatus> excludedStatuses);
 }

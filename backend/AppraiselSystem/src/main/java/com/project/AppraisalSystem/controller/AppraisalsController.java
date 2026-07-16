@@ -5,6 +5,8 @@ import com.project.AppraisalSystem.entity.enums.CycleStatus;
 import com.project.AppraisalSystem.security.CurrentUserService;
 import com.project.AppraisalSystem.service.AppraisalsService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +27,10 @@ public class AppraisalsController {
 
     @PreAuthorize("hasRole('HR')")
     @GetMapping
-    public ResponseEntity<List<AppraisalsSummaryDTO>> findAllAppraisals() {
-        return ResponseEntity.ok(appraisalsService.findAllAppraisals());
+    public ResponseEntity<Page<AppraisalsSummaryDTO>> findAllAppraisals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(appraisalsService.findAllAppraisals(PageRequest.of(page, size)));
     }
 
     @GetMapping("/my")
@@ -37,6 +41,7 @@ public class AppraisalsController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER') or @appraisalsServiceImpl.isOwner(#appraisalId, @currentUserService.getCurrentUserId())")
     @GetMapping("/{appraisalId}")
     public ResponseEntity<EmployeeAppraisalResponseDTO> findAppraisalById(@PathVariable Long appraisalId) {
         return ResponseEntity.ok(appraisalsService.findAppraisalDetailById(appraisalId));
@@ -50,24 +55,31 @@ public class AppraisalsController {
 
     @PreAuthorize("hasRole('HR')")
     @GetMapping("/cycle/{cycleName}")
-    public ResponseEntity<List<AppraisalsSummaryDTO>> findAppraisalsByCycle(
-            @PathVariable String cycleName) {
-        return ResponseEntity.ok(appraisalsService.findAppraisalsByCycle(cycleName));
+    public ResponseEntity<Page<AppraisalsSummaryDTO>> findAppraisalsByCycle(
+            @PathVariable String cycleName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(appraisalsService.findAppraisalsByCycle(cycleName, PageRequest.of(page, size)));
     }
 
     @PreAuthorize("hasRole('HR')")
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<AppraisalsSummaryDTO>> findAppraisalsByStatus(
-            @PathVariable AppraisalStatus status) {
-        return ResponseEntity.ok(appraisalsService.findAppraisalsByStatus(status));
+    public ResponseEntity<Page<AppraisalsSummaryDTO>> findAppraisalsByStatus(
+            @PathVariable AppraisalStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(appraisalsService.findAppraisalsByStatus(status, PageRequest.of(page, size)));
     }
 
     @PreAuthorize("hasRole('HR')")
     @GetMapping("/cycle-status/{cycleStatus}")
-    public ResponseEntity<List<AppraisalsSummaryDTO>> findAppraisalsByCycleStatus(
-            @PathVariable CycleStatus cycleStatus) {
-        return ResponseEntity.ok(appraisalsService.findAppraisalsByCycleStatus(cycleStatus));
+    public ResponseEntity<Page<AppraisalsSummaryDTO>> findAppraisalsByCycleStatus(
+            @PathVariable CycleStatus cycleStatus,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(appraisalsService.findAppraisalsByCycleStatus(cycleStatus, PageRequest.of(page, size)));
     }
+
 
     @PreAuthorize("hasRole('HR')")
     @PostMapping
@@ -156,9 +168,11 @@ public class AppraisalsController {
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @GetMapping("/manager/{managerId}")
-    public ResponseEntity<List<AppraisalsByManagerDTO>> findAppraisalsByManager(
-            @PathVariable Long managerId) {
-        return ResponseEntity.ok(appraisalsService.findAppraisalsByManager_Id(managerId));
+    public ResponseEntity<Page<AppraisalsByManagerDTO>> findAppraisalsByManager(
+            @PathVariable Long managerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(appraisalsService.findAppraisalsByManager_Id(managerId, PageRequest.of(page, size)));
     }
 
     @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
@@ -203,7 +217,7 @@ public class AppraisalsController {
         return ResponseEntity.ok(appraisalsService
                 .submitManagerReviewByEmployeeEmail(employeeEmail, cycleName, dto));
     }
-
+    @PreAuthorize("hasRole('HR')")
     @PutMapping("/{id}")
     public ResponseEntity<AppraisalsSummaryDTO> updateAppraisal(
             @PathVariable Long id,
@@ -211,7 +225,7 @@ public class AppraisalsController {
         return ResponseEntity.ok(appraisalsService.updateAppraisal(id, dto));
     }
 
-
+    @PreAuthorize("hasRole('HR')")
     @GetMapping("/report/export")
     public ResponseEntity<byte[]> exportReport(@RequestParam String cycleName) throws IOException {
         byte[] excelBytes = appraisalsService.generateReportExcel(cycleName);
@@ -223,6 +237,8 @@ public class AppraisalsController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelBytes);
     }
+
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
     @GetMapping("/manager/{managerId}/report/export")
     public ResponseEntity<byte[]> exportTeamReport(
             @PathVariable Long managerId,

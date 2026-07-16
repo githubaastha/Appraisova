@@ -3,10 +3,12 @@ package com.project.AppraisalSystem.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +23,13 @@ public class JwtService {
     private long expiration;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+    @PostConstruct
+    private void validateSecret() {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("jwt.secret must be at least 32 characters (256 bits) for HS256 signing.");
+        }
     }
 
     public String generateToken(String email, String role, Long userId) {

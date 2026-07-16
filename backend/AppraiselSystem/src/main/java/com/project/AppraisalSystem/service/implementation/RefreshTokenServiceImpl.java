@@ -2,6 +2,7 @@ package com.project.AppraisalSystem.service.implementation;
 
 import com.project.AppraisalSystem.entity.RefreshToken;
 import com.project.AppraisalSystem.entity.User;
+import com.project.AppraisalSystem.exception.BadRequestException;
 import com.project.AppraisalSystem.repository.RefreshTokenRepository;
 import com.project.AppraisalSystem.service.RefreshTokenService;
 import jakarta.transaction.Transactional;
@@ -50,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token expired. Please log in again.");
+            throw new BadRequestException("Refresh token expired. Please log in again.");
         }
         return token;
     }
